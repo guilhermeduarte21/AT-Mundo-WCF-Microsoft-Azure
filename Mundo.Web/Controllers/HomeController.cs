@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Mundo.Web.Models;
+using Mundo.Web.Models.Home;
 
 namespace Mundo.Web.Controllers
 {
@@ -20,13 +21,16 @@ namespace Mundo.Web.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var pgInicial = new PaginaInicialViewModel
+            {
+                QuantidadeAmigos = 0,
+                QuantidadeEstados = 0,
+                QuantidadePaises = 0
+            };
+
+            return View(pgInicial);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
