@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mundo.Web.ApiServices;
+using Mundo.Web.ApiServices.Pessoa;
 
 namespace Mundo.Web
 {

@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mundo.Api.Pesssoas.Domain.Pessoa;
-using Mundo.Api.Pesssoas.Repository.Context;
+using Mundo.Api.Pesssoas.Data;
 
 namespace Mundo.Api.Pesssoas.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Amigos")]
     [ApiController]
     public class PessoasController : ControllerBase
     {
@@ -43,8 +42,6 @@ namespace Mundo.Api.Pesssoas.Controllers
         }
 
         // PUT: api/Pessoas/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPessoas(Guid id, Pessoas pessoas)
         {
@@ -75,8 +72,6 @@ namespace Mundo.Api.Pesssoas.Controllers
         }
 
         // POST: api/Pessoas
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<Pessoas>> PostPessoas(Pessoas pessoas)
         {

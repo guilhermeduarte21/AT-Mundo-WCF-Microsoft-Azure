@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mundo.Domain.Paises.Estado.Mundo
+namespace Mundo.Api.Paises.Estados.Domain
 {
     public class Pais
     {

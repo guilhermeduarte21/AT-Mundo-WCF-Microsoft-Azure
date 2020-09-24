@@ -1,5 +1,4 @@
-﻿using Mundo.Api.Pesssoas.Domain.Mundo;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,7 +14,7 @@ namespace Mundo.Api.Pesssoas.Domain.Pessoa
         public string Telefone { get; set; }
         public DateTime DataAniversario { get; set; }
         public virtual List<Pessoas> Amigos { get; set; } = new List<Pessoas>();
-        public Pais PaisOrigiem { get; set; }
-        public Estado EstadoOrigem { get; set; }
+        public Guid Id_PaisOrigiem { get; set; }
+        public Guid Id_EstadoOrigem { get; set; }
     }
 }
