@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Mundo.Web.Models.Pessoa;
 using RestSharp;
 
@@ -46,6 +48,8 @@ namespace Mundo.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CriarPessoaViewModel criarPessoaViewModel)
         {
+            criarPessoaViewModel.UrlFoto = "https://redesocialinfnet.blob.core.windows.net/fotos-amigos/6b854062-285b-46be-b056-6606d2d226c7";
+
             try
             {
                 if (ModelState.IsValid == false)
@@ -72,7 +76,7 @@ namespace Mundo.Web.Controllers
             var client = new RestClient();
             var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
 
-            var response = client.Get<PessoasViewModel>(request);
+            var response = client.Get<EditarPessoaViewModel>(request);
 
             return View(response.Data);
         }
@@ -80,8 +84,11 @@ namespace Mundo.Web.Controllers
         // POST: PessoaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Guid id, EditarPessoaViewModel editarPessoaViewModel)
+        public ActionResult Edit(Guid id, EditarPessoaViewModel editarPessoaViewModel, IFormFile foto)
         {
+            var urlFoto = UploadFotoPessoa(foto, editarPessoaViewModel.Id);
+            editarPessoaViewModel.UrlFoto = urlFoto;
+
             try
             {
                 if (ModelState.IsValid == false)
@@ -133,6 +140,20 @@ namespace Mundo.Web.Controllers
             {
                 return View();
             }
+        }
+
+        private string UploadFotoPessoa(IFormFile urlFoto, Guid id)
+        {
+            var reader = urlFoto.OpenReadStream();
+            var cloudStorageAccount = CloudStorageAccount.Parse(@"DefaultEndpointsProtocol=https;AccountName=redesocialinfnet;AccountKey=vZcfcl7NqHfcIQJXfUXZRe4U1ePNyU3D4A9mkbj4yoWNFWl/2f78zN9gDFfbg05n1tKvp6QlTTT5jRIVFtTqmg==;EndpointSuffix=core.windows.net");
+            var blobClient = cloudStorageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("fotos-amigos");
+            container.CreateIfNotExists();
+            var blob = container.GetBlockBlobReference(id.ToString());
+            blob.UploadFromStream(reader);
+            var destinoDaImagemNaNuvem = blob.Uri.ToString();
+
+            return destinoDaImagemNaNuvem;
         }
     }
 }
