@@ -4,35 +4,35 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Mundo.Web.ApiServices;
-using Mundo.Web.ApiServices.Pessoa;
 using Mundo.Web.Models.Pessoa;
+using RestSharp;
 
 namespace Mundo.Web.Controllers
 {
     public class PessoaController : Controller
     {
-        private readonly IPessoaApi _pessoaApi;
-
-        public PessoaController(IPessoaApi pessoaApi)
-        {
-            _pessoaApi = pessoaApi;
-        }
-
-
+        private readonly string _UriAPI = "https://localhost:44311/";
 
         // GET: PessoaController
         public ActionResult Index()
         {
-            var Lista = new List<ListarPessoasViewModel>();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Amigos");
 
-            return View(Lista);
+            var response = client.Get<List<ListarPessoasViewModel>>(request);
+
+            return View(response.Data);
         }
 
         // GET: PessoaController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
+
+            var response = client.Get<PessoasViewModel>(request);
+
+            return View(response.Data);
         }
 
         // GET: PessoaController/Create
@@ -46,10 +46,18 @@ namespace Mundo.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CriarPessoaViewModel criarPessoaViewModel)
         {
-            var result = await _pessoaApi.PostAsync(criarPessoaViewModel);
-
             try
             {
+                if (ModelState.IsValid == false)
+                    return View(criarPessoaViewModel);
+
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Amigos", DataFormat.Json);
+
+                request.AddJsonBody(criarPessoaViewModel);
+
+                var response = await client.PostAsync<CriarPessoaViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -59,18 +67,33 @@ namespace Mundo.Web.Controllers
         }
 
         // GET: PessoaController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
+
+            var response = client.Get<PessoasViewModel>(request);
+
+            return View(response.Data);
         }
 
         // POST: PessoaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Guid id, EditarPessoaViewModel editarPessoaViewModel)
         {
             try
             {
+                if (ModelState.IsValid == false)
+                    return View(editarPessoaViewModel);
+
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
+
+                request.AddJsonBody(editarPessoaViewModel);
+
+                var response = client.Put<EditarPessoaViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -80,18 +103,30 @@ namespace Mundo.Web.Controllers
         }
 
         // GET: PessoaController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
+
+            var response = client.Get<PessoasViewModel>(request);
+
+            return View(response.Data);
         }
 
         // POST: PessoaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(Guid id, PessoasViewModel pessoasViewModel)
         {
             try
             {
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
+
+                request.AddJsonBody(pessoasViewModel);
+
+                var response = client.Delete<PessoasViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch

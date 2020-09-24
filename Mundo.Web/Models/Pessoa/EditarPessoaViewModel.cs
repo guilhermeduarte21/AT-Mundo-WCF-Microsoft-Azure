@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Mundo.Web.Models.Pessoa
 {
-    public class EditarViewModel
+    public class EditarPessoaViewModel
     {
         public Guid Id { get; set; }
         public string UrlFoto { get; set; }
@@ -12,7 +12,5 @@ namespace Mundo.Web.Models.Pessoa
         public string Email { get; set; }
         public string Telefone { get; set; }
         public DateTime DataAniversario { get; set; }
-
-        public List<string> Erros { get; set; } = new List<string>();
     }
 }

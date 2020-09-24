@@ -17,7 +17,5 @@ namespace Mundo.Web.Models.Pessoa
         public DateTime DataAniversario { get; set; }
         public PaisViewModel PaisOrigiem { get; set; }
         public EstadoViewModel EstadoOrigem { get; set; }
-
-        public List<string> Erros { get; set; } = new List<string>();
     }
 }
