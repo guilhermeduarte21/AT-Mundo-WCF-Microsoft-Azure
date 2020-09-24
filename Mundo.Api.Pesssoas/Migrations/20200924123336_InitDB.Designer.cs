@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Mundo.Api.Pesssoas.Data;
+using Mundo.Api.Pessoas.Data;
 
-namespace Mundo.Api.Pesssoas.Migrations
+namespace Mundo.Api.Pessoas.Migrations
 {
-    [DbContext(typeof(MundoApiPesssoasContext))]
+    [DbContext(typeof(MundoApiPessoasContext))]
     [Migration("20200924123336_InitDB")]
     partial class InitDB
     {

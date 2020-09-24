@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Mundo.Api.Pesssoas.Migrations
+namespace Mundo.Api.Pessoas.Migrations
 {
     public partial class InitDB : Migration
     {

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mundo.Web", "Mundo.Web\Mund
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mundo.Api.Paises.Estados", "Mundo.Api.Paises.Estados\Mundo.Api.Paises.Estados.csproj", "{58FA7F65-F868-46B7-9F0B-55B9E080ABBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mundo.Api.Pesssoas", "Mundo.Api.Pesssoas\Mundo.Api.Pesssoas.csproj", "{42F09426-4643-472A-B06A-E9A5BCA000AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mundo.Api.Pessoas", "Mundo.Api.Pesssoas\Mundo.Api.Pessoas.csproj", "{42F09426-4643-472A-B06A-E9A5BCA000AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

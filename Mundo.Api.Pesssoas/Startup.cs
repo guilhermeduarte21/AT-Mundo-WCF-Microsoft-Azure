@@ -11,9 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Mundo.Api.Pesssoas.Data;
+using Mundo.Api.Pessoas.Data;
+using AutoMapper;
 
-namespace Mundo.Api.Pesssoas
+namespace Mundo.Api.Pessoas
 {
     public class Startup
     {
@@ -29,9 +30,10 @@ namespace Mundo.Api.Pesssoas
         {
             services.AddControllers();
 
-            services.AddDbContext<MundoApiPesssoasContext>(options =>
+            services.AddDbContext<MundoApiPessoasContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("MundoApiPesssoasContext")));
 
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
