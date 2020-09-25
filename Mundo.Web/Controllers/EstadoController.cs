@@ -4,36 +4,65 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using Mundo.Web.Models.Estado;
+using RestSharp;
 
 namespace Mundo.Web.Controllers
 {
     public class EstadoController : Controller
     {
-        // GET: EstadoController
+        private readonly string _UriAPI = "https://localhost:44310/";
+
+        // GET: PaisController
         public ActionResult Index()
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Estados");
+
+            var response = client.Get<List<EstadoViewModel>>(request);
+
+            return View(response.Data);
         }
 
-        // GET: EstadoController/Details/5
-        public ActionResult Details(int id)
+        // GET: PaisController/Details/5
+        public ActionResult Details(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Estados/" + id, DataFormat.Json);
+
+            var response = client.Get<EstadoViewModel>(request);
+
+            return View(response.Data);
         }
 
-        // GET: EstadoController/Create
+        // GET: PaisController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: EstadoController/Create
+        // POST: PaisController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(EstadoViewModel estadoViewModel, IFormFile foto)
         {
+            var urlFoto = UploadFotoPessoa(foto, estadoViewModel.Nome);
+            estadoViewModel.UrlFoto = urlFoto;
+
             try
             {
+                if (ModelState.IsValid == false)
+                    return View(estadoViewModel);
+
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Estados", DataFormat.Json);
+
+                request.AddJsonBody(estadoViewModel);
+
+                var response = await client.PostAsync<EstadoViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -42,19 +71,40 @@ namespace Mundo.Web.Controllers
             }
         }
 
-        // GET: EstadoController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: PaisController/Edit/5
+        public ActionResult Edit(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Estados/" + id, DataFormat.Json);
+
+            var response = client.Get<EstadoViewModel>(request);
+
+            return View(response.Data);
         }
 
-        // POST: EstadoController/Edit/5
+        // POST: PaisController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Guid id, EstadoViewModel estadoViewModel, IFormFile foto)
         {
+            if (foto != null)
+            {
+                var urlFoto = UploadFotoPessoa(foto, estadoViewModel.Nome);
+                estadoViewModel.UrlFoto = urlFoto;
+            }
+
             try
             {
+                if (ModelState.IsValid == false)
+                    return View(estadoViewModel);
+
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Estados/" + id, DataFormat.Json);
+
+                request.AddJsonBody(estadoViewModel);
+
+                var response = client.Put<EstadoViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -63,25 +113,51 @@ namespace Mundo.Web.Controllers
             }
         }
 
-        // GET: EstadoController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: PaisController/Delete/5
+        public ActionResult Delete(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Estados/" + id, DataFormat.Json);
+
+            var response = client.Get<EstadoViewModel>(request);
+
+            return View(response.Data);
         }
 
-        // POST: EstadoController/Delete/5
+        // POST: PaisController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(Guid id, EstadoViewModel estadoViewModel)
         {
             try
             {
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Estados/" + id, DataFormat.Json);
+
+                request.AddJsonBody(estadoViewModel);
+
+                var response = client.Delete<EstadoViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
                 return View();
             }
+        }
+
+        private string UploadFotoPessoa(IFormFile urlFoto, string NomePais)
+        {
+            var reader = urlFoto.OpenReadStream();
+            var cloudStorageAccount = CloudStorageAccount.Parse(@"DefaultEndpointsProtocol=https;AccountName=redesocialinfnet;AccountKey=vZcfcl7NqHfcIQJXfUXZRe4U1ePNyU3D4A9mkbj4yoWNFWl/2f78zN9gDFfbg05n1tKvp6QlTTT5jRIVFtTqmg==;EndpointSuffix=core.windows.net");
+            var blobClient = cloudStorageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("fotos-estados");
+            container.CreateIfNotExists();
+            var blob = container.GetBlockBlobReference(NomePais);
+            blob.UploadFromStream(reader);
+            var destinoDaImagemNaNuvem = blob.Uri.ToString();
+
+            return destinoDaImagemNaNuvem;
         }
     }
 }

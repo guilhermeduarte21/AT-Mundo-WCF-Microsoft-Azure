@@ -4,21 +4,38 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using Mundo.Web.Models.Estado;
+using Mundo.Web.Models.Pais;
+using RestSharp;
 
 namespace Mundo.Web.Controllers
 {
     public class PaisController : Controller
     {
+        private readonly string _UriAPI = "https://localhost:44310/";
+
         // GET: PaisController
         public ActionResult Index()
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Pais");
+
+            var response = client.Get<List<ListarPaisViewModel>>(request);
+
+            return View(response.Data);
         }
 
         // GET: PaisController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Pais/" + id, DataFormat.Json);
+
+            var response = client.Get<PaisViewModel>(request);
+
+            return View(response.Data);
         }
 
         // GET: PaisController/Create
@@ -30,10 +47,23 @@ namespace Mundo.Web.Controllers
         // POST: PaisController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(CriarPaisViewModel criarPaisViewModel, IFormFile foto)
         {
+            var urlFoto = UploadFotoPessoa(foto, criarPaisViewModel.Nome);
+            criarPaisViewModel.UrlFoto = urlFoto;
+
             try
             {
+                if (ModelState.IsValid == false)
+                    return View(criarPaisViewModel);
+
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Pais", DataFormat.Json);
+
+                request.AddJsonBody(criarPaisViewModel);
+
+                var response = await client.PostAsync<CriarPaisViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -43,18 +73,39 @@ namespace Mundo.Web.Controllers
         }
 
         // GET: PaisController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Pais/" + id, DataFormat.Json);
+
+            var response = client.Get<EditarPaisViewModel>(request);
+
+            return View(response.Data);
         }
 
         // POST: PaisController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Guid id, EditarPaisViewModel editarPaisViewModel, IFormFile foto)
         {
+            if (foto != null)
+            {
+                var urlFoto = UploadFotoPessoa(foto, editarPaisViewModel.Nome);
+                editarPaisViewModel.UrlFoto = urlFoto;
+            }
+
             try
             {
+                if (ModelState.IsValid == false)
+                    return View(editarPaisViewModel);
+
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Pais/" + id, DataFormat.Json);
+
+                request.AddJsonBody(editarPaisViewModel);
+
+                var response = client.Put<EditarPaisViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -64,24 +115,50 @@ namespace Mundo.Web.Controllers
         }
 
         // GET: PaisController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid id)
         {
-            return View();
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Pais/" + id, DataFormat.Json);
+
+            var response = client.Get<PaisViewModel>(request);
+
+            return View(response.Data);
         }
 
         // POST: PaisController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(Guid id, PaisViewModel paisViewModel)
         {
             try
             {
+                var client = new RestClient();
+                var request = new RestRequest(_UriAPI + "api/Pais/" + id, DataFormat.Json);
+
+                request.AddJsonBody(paisViewModel);
+
+                var response = client.Delete<PaisViewModel>(request);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
                 return View();
             }
+        }
+
+        private string UploadFotoPessoa(IFormFile urlFoto, string NomePais)
+        {
+            var reader = urlFoto.OpenReadStream();
+            var cloudStorageAccount = CloudStorageAccount.Parse(@"DefaultEndpointsProtocol=https;AccountName=redesocialinfnet;AccountKey=vZcfcl7NqHfcIQJXfUXZRe4U1ePNyU3D4A9mkbj4yoWNFWl/2f78zN9gDFfbg05n1tKvp6QlTTT5jRIVFtTqmg==;EndpointSuffix=core.windows.net");
+            var blobClient = cloudStorageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("fotos-paises");
+            container.CreateIfNotExists();
+            var blob = container.GetBlockBlobReference(NomePais);
+            blob.UploadFromStream(reader);
+            var destinoDaImagemNaNuvem = blob.Uri.ToString();
+
+            return destinoDaImagemNaNuvem;
         }
     }
 }

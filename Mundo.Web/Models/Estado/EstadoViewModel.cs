@@ -10,5 +10,6 @@ namespace Mundo.Web.Models.Estado
         public Guid Id { get; set; }
         public string UrlFoto { get; set; }
         public string Nome { get; set; }
+        public Guid IdPais { get; set; }
     }
 }
