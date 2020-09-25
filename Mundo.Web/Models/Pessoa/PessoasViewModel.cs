@@ -14,8 +14,10 @@ namespace Mundo.Web.Models.Pessoa
         public string Email { get; set; }
         public string Telefone { get; set; }
         public DateTime DataAniversario { get; set; }
-        public virtual List<PessoasViewModel> Amigos { get; set; } = new List<PessoasViewModel>();
+        public virtual List<PessoasResponseViewModel> Amigos { get; set; } = new List<PessoasResponseViewModel>();
         public PaisViewModel PaisOrigiem { get; set; }
         public EstadoViewModel EstadoOrigem { get; set; }
+
+        public virtual List<PessoasResponseViewModel> TodosAmigos { get; set; } = new List<PessoasResponseViewModel>();
     }
 }

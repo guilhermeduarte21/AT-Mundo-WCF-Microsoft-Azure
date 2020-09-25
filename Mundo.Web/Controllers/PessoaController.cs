@@ -26,15 +26,53 @@ namespace Mundo.Web.Controllers
             return View(response.Data);
         }
 
+        [HttpGet("{id}")]
         // GET: PessoaController/Details/5
-        public ActionResult Details(Guid id)
+        public ActionResult Details([FromRoute] Guid id)
         {
             var client = new RestClient();
             var request = new RestRequest(_UriAPI + "api/Amigos/" + id, DataFormat.Json);
 
             var response = client.Get<PessoasViewModel>(request);
 
+            //Pego a lista de amigos
+            var requestAmigos = new RestRequest(_UriAPI + "api/Amigos/" + id + "/Amigos", DataFormat.Json);
+            response.Data.Amigos = client.Get<List<PessoasResponseViewModel>>(requestAmigos).Data;
+
+            //Lista de todas as pessoas
+            var requestTodosAmigos = new RestRequest(_UriAPI + "api/Amigos", DataFormat.Json);
+            response.Data.TodosAmigos = client.Get<List<PessoasResponseViewModel>>(requestTodosAmigos).Data;
+
+            //Remove a propria pessoa e os amigos ja adicionado
+            var pessoa = response.Data.TodosAmigos.First(x => x.Id == id);
+            response.Data.TodosAmigos.Remove(pessoa);
+
             return View(response.Data);
+        }
+
+
+        public ActionResult DetailsPost(Guid id, Guid idAmigo)
+        {
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Amigos/" + id + "/Amigos");
+
+            request.AddJsonBody(idAmigo);
+
+            var response = client.Post(request);
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        public ActionResult DetailsDelete(Guid id, Guid idAmigo)
+        {
+            var client = new RestClient();
+            var request = new RestRequest(_UriAPI + "api/Amigos/" + id + "/Amigos");
+
+            request.AddJsonBody(idAmigo);
+
+            var response = client.Delete(request);
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         // GET: PessoaController/Create

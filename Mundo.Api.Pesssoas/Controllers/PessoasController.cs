@@ -125,7 +125,7 @@ namespace Mundo.Api.Pessoas.Controllers
         }
 
         [HttpPost("{id}/Amigos")]
-        public async Task<ActionResult> PostAmigos([FromRoute] Guid id, [FromBody] PostAmigosRequest request)
+        public async Task<ActionResult> PostAmigos([FromRoute] Guid id, [FromBody] Guid idAmigo)
         {
             var pessoa = await _context.Pessoas.FindAsync(id);
 
@@ -134,19 +134,34 @@ namespace Mundo.Api.Pessoas.Controllers
                 return NotFound();
             }
 
-            var amigos = await _context.Pessoas.Where(x => request.Ids.Contains(x.Id)).ToListAsync();
+            var amigo = await _context.Pessoas.FindAsync(idAmigo);
 
-            pessoa.Amigos = amigos;
+            pessoa.Amigos.Add(amigo);
 
             _context.Pessoas.Update(pessoa);
             await _context.SaveChangesAsync();
 
             return Ok();
         }
-    }
 
-    public class PostAmigosRequest
-    {
-        public Guid[] Ids { get; set; }
+        [HttpDelete("{id}/Amigos")]
+        public async Task<ActionResult> DeleteAmigos([FromRoute] Guid id, [FromBody] Guid idAmigo)
+        {
+            var pessoa = await _context.Pessoas.FindAsync(id);
+
+            if (pessoa == null)
+            {
+                return NotFound();
+            }
+
+            var amigo = await _context.Pessoas.FindAsync(idAmigo);
+
+            pessoa.Amigos.Remove(amigo);
+
+            _context.Pessoas.Update(pessoa);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

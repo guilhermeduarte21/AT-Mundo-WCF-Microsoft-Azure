@@ -16,9 +16,7 @@ namespace Mundo.Api.Pessoas.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder
-                .Entity<Domain.Pessoas>()
-                .HasMany(x => x.Amigos);
+            modelBuilder.Entity<Domain.Pessoas>().HasMany(x => x.Amigos);
         }
 
         public DbSet<Domain.Pessoas> Pessoas { get; set; }
