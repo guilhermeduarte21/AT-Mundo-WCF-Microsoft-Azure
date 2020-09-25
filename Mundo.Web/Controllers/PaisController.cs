@@ -35,6 +35,9 @@ namespace Mundo.Web.Controllers
 
             var response = client.Get<PaisViewModel>(request);
 
+            var requestEstados = new RestRequest(_UriAPI + "api/Pais/" + id + "/Estados", DataFormat.Json);
+            response.Data.Estados = client.Get<List<EstadoViewModel>>(requestEstados).Data;
+
             return View(response.Data);
         }
 

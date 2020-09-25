@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Mundo.Web.Models.Estado;
+using Mundo.Web.Models.Pais;
 using RestSharp;
 
 namespace Mundo.Web.Controllers
@@ -62,6 +63,11 @@ namespace Mundo.Web.Controllers
                 request.AddJsonBody(estadoViewModel);
 
                 var response = await client.PostAsync<EstadoViewModel>(request);
+
+                var requestPais = new RestRequest(_UriAPI + "api/Pais/" + estadoViewModel.IdPais + "/Estados", DataFormat.Json);
+                requestPais.AddJsonBody(response.Id);
+
+                var responsePais = client.Post(requestPais);
 
                 return RedirectToAction(nameof(Index));
             }

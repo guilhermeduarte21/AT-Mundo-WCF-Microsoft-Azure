@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mundo.Api.Paises.Estados.Data;
@@ -100,6 +101,61 @@ namespace Mundo.Api.Paises.Estados.Controllers
         private bool PaisExists(Guid id)
         {
             return _context.Pais.Any(e => e.Id == id);
+        }
+
+        [HttpGet("{id}/Estados")]
+        public async Task<ActionResult> GetEstados([FromRoute] Guid id)
+        {
+            var pais = await _context.Pais.Include(x => x.Estados).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (pais == null)
+            {
+                return NotFound();
+            }
+
+            var response = pais.Estados;
+
+            return Ok(response);
+        }
+
+        [HttpPost("{id}/Estados")]
+        public async Task<ActionResult> PostEstados([FromRoute] Guid id, [FromBody] Guid idEstado)
+        {
+            var pais = await _context.Pais.FindAsync(id);
+
+            if (pais == null)
+            {
+                return NotFound();
+            }
+
+            var estado = await _context.Estados.FindAsync(idEstado);
+
+            pais.Estados.Add(estado);
+
+            _context.Pais.Update(pais);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}/Estados")]
+        public async Task<ActionResult> DeleteEstados([FromRoute] Guid id, [FromBody] Guid idEstado)
+        {
+            var pais = await _context.Pais.FindAsync(id);
+
+            if (pais == null)
+            {
+                return NotFound();
+            }
+
+            var estado = await _context.Estados.FindAsync(idEstado);
+
+            pais.Estados.Remove(estado);
+
+            _context.Pais.Update(pais);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

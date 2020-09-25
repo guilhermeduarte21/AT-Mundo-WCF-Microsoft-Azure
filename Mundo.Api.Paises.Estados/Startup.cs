@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Mundo.Api.Paises.Estados.Data;
+using AutoMapper;
 
 namespace Mundo.Api.Paises.Estados
 {
@@ -31,6 +32,8 @@ namespace Mundo.Api.Paises.Estados
 
             services.AddDbContext<MundoApiPaisesEstadosContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("MundoApiPaisesEstadosContext")));
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
